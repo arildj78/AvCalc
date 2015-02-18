@@ -55,7 +55,7 @@
  * returns a pointer to a double containing distance expressed as radians
  * ----------------------------------------------------------------------------
  */
-double _stdcall Distance(static double* lat1, static double* lon1, static double* lat2, static double* lon2)
+double _stdcall Distance(const double* lat1, const double* lon1, const double* lat2, const double* lon2)
 {
 	return R2D * 2 * asin(sqrt(pow(sin(D2R*(*lat1-*lat2)/2),2) +
 			                   pow(sin(D2R*(*lon2-*lon1)/2),2) * cos(D2R* *lat1) * cos(D2R* *lat2)
