@@ -1,4 +1,4 @@
-/* Aviation Calculations API v0.01
+/* Aviation Calculation - AVCALC API v0.01
    Copyright (C) 2015  Arild M Johannessen
  
    This program is free software: you can redistribute it and/or modify
