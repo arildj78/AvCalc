@@ -94,8 +94,8 @@ double _stdcall Course (double *lat1, double *lon1, double *lat2, double *lon2)
 
 long long SpeedTest(){
 	LARGE_INTEGER StartingTime, EndingTime, Frequency;
-	uint64_t  ElapsedNanoseconds1, ElapsedNanoseconds2;
-	uint64_t  duration1, duration2;
+	uint64_t  ElapsedNanoseconds;
+	uint64_t  duration;
 
 	QueryPerformanceFrequency(&Frequency);
 
@@ -110,37 +110,23 @@ long long SpeedTest(){
 	double lon2 = 18;
 	x=0;
 
-	//Single run through
-	QueryPerformanceCounter(&StartingTime);
-	//procedure to be tested
-	x=DistanceD(lat1, lon1, lat2, lon2);
-	QueryPerformanceCounter(&EndingTime);
-	duration1 = EndingTime.QuadPart - StartingTime.QuadPart;
-
-
-
 
 	//20 mill runthroughs
 	QueryPerformanceCounter(&StartingTime);
 	unsigned long n;
 	for(n = 0;n<Repetitions; n++){
 		//procedure to be tested
-		x=Distance(lat1, lon1, lat2, lon2);
+		x=Distance(&lat1, &lon1, &lat2, &lon2);
 	}
 	QueryPerformanceCounter(&EndingTime);
-	duration2 = EndingTime.QuadPart - StartingTime.QuadPart;
+	duration = EndingTime.QuadPart - StartingTime.QuadPart;
 
-	ElapsedNanoseconds1 = 1e9 * duration1;
-	ElapsedNanoseconds1 /= Frequency.QuadPart;
+	ElapsedNanoseconds = 1e9 * duration;
+	ElapsedNanoseconds /= Frequency.QuadPart;
 
-	ElapsedNanoseconds2 = 1e9 * duration2;
-	ElapsedNanoseconds2 /= Frequency.QuadPart;
+	double Average = (double) ElapsedNanoseconds/(double) Repetitions;
 
-
-	double Average = (double) ElapsedNanoseconds2/(double) Repetitions;
-	double RepetitionsD = Repetitions;
-	printf("Single  runtime = %.2fns\n",(double) ElapsedNanoseconds1 );
-	printf("Average runtime over %.2e repetitions = %.8fns\n",RepetitionsD, Average );
+	printf("Average runtime over %.2e repetitions = %.8fns\n",(double) Repetitions, Average );
 
 }
 
