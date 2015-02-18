@@ -48,19 +48,26 @@
 
 
 /*
- * Distance between points
- *
- * The great circle distance d between two points with coordinates {lat1,lon1}
- * and {lat2,lon2} is given by:
- * returns a pointer to a double containing distance expressed as radians
- * ----------------------------------------------------------------------------
- */
+----------------------------------------------------------------------------
+Distance between points
+
+The great circle distance d between two points with coordinates {lat1,lon1}
+and {lat2,lon2} is given by:
+----------------------------------------------------------------------------
+Implementation
+Argument 1: INPUT - Pointer to double containing Latitude  of point 1
+Argument 2: INPUT - Pointer to double containing Longitude of point 1
+Argument 3: INPUT - Pointer to double containing Latitude  of point 2
+Argument 4: INPUT - Pointer to double containing Longitude of point 2
+
+RETURN: Double containing distance in nautical miles (1nm = 1852m)
+----------------------------------------------------------------------------*/
 double _stdcall Distance(const double* lat1, const double* lon1, const double* lat2, const double* lon2)
 {
-	return R2D * 2 * asin(sqrt(pow(sin(D2R*(*lat1-*lat2)/2),2) +
-			                   pow(sin(D2R*(*lon2-*lon1)/2),2) * cos(D2R* *lat1) * cos(D2R* *lat2)
-							  )
-						 );
+	return 60 * R2D * 2 * asin(sqrt(pow(sin(D2R*(*lat1-*lat2)/2),2) +
+			                        pow(sin(D2R*(*lon2-*lon1)/2),2) * cos(D2R* *lat1) * cos(D2R* *lat2)
+								   )
+							  );
 }
 
 
