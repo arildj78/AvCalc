@@ -22,12 +22,14 @@
  *             Converted to C by Arild M Johannessen (February 2015)
  *
  * -------------------------------------------------------------------------------
- * Implementation notice
+ * Change from the original work and implementation notice
  * -------------------------------------------------------------------------------
- * East/West longitude is rewritten to conform with the defacto standard
- * used in most other applications throughout the world.
- * North and East is positive numbers, South and West is negative.
- * ------------------------------------------------------------------------------- */
+ * Eastern longitudes are now positive values, western are negative.
+ * North/south is unchanged with north as positive
+ * Input is changed from radians to degrees and nautical miles.
+
+ * Calling convention for all methods is: stdcall (compatible with Win32 API)
+ * -----------------------------------------------------------------------------*/
 
 #include <math.h>
 #include <Windows.h>  //To be removed when speedtesting is complete
@@ -37,31 +39,20 @@
 
 
 
+/*--------------------------------------------------------------------------
+  Distance between points
 
-
-/*
- *--------------------------------------------------------------------------------
- * Some great circle formulae:
- * ----------------------------------------------------------------------------
- */
-
-
-
-/*
+  The great circle distance d between two points with coordinates {lat1,lon1}
+  and {lat2,lon2} is given by:
 ----------------------------------------------------------------------------
-Distance between points
+  Implementation
+  Argument 1: INPUT - Pointer to double containing Latitude  of point 1
+  Argument 2: INPUT - Pointer to double containing Longitude of point 1
+  Argument 3: INPUT - Pointer to double containing Latitude  of point 2
+  Argument 4: INPUT - Pointer to double containing Longitude of point 2
 
-The great circle distance d between two points with coordinates {lat1,lon1}
-and {lat2,lon2} is given by:
-----------------------------------------------------------------------------
-Implementation
-Argument 1: INPUT - Pointer to double containing Latitude  of point 1
-Argument 2: INPUT - Pointer to double containing Longitude of point 1
-Argument 3: INPUT - Pointer to double containing Latitude  of point 2
-Argument 4: INPUT - Pointer to double containing Longitude of point 2
-
-RETURN: Double containing distance in nautical miles (1nm = 1852m)
-----------------------------------------------------------------------------*/
+  RETURN: Double containing distance in nautical miles (1nm = 1852m)
+--------------------------------------------------------------------------*/
 double _stdcall Distance(const double* lat1, const double* lon1, const double* lat2, const double* lon2)
 {
 	return 60 * R2D * 2 * asin(sqrt(pow(sin(D2R*(*lat1-*lat2)/2),2) +
