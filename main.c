@@ -30,9 +30,9 @@
  * ------------------------------------------------------------------------------- */
 
 #include <math.h>
-#include <Windows.h>  //Kun for testing
-#include <stdio.h>    //Kun for testing (tror jeg)
-#include <inttypes.h> //Kun for testing
+#include <Windows.h>  //To be removed when speedtesting is complete
+#include <stdio.h>    //To be removed when speedtesting is complete
+#include <inttypes.h> //To be removed when speedtesting is complete
 #include "main.h"
 
 
