@@ -1,7 +1,7 @@
 /*
  * main.c
  * -------------------------------------------------------------------------------
- *                          Aviation Formulary V1.45
+ *                          Aviation Formulary V1.46
  *                              By Ed Williams
  *
  * -------------------------------------------------------------------------------
@@ -24,9 +24,9 @@
  */
 
 #include <math.h>
-#include <Windows.h>
-#include <stdio.h>
-#include <inttypes.h>
+#include <Windows.h>  //Kun for testing
+#include <stdio.h>    //Kun for testing (tror jeg)
+#include <inttypes.h> //Kun for testing
 #include "main.h"
 
 
@@ -49,10 +49,10 @@
  * returns a pointer to a double containing distance expressed as radians
  * ----------------------------------------------------------------------------
  */
-double _stdcall Distance(double lat1, double lon1, double lat2, double lon2)
+double _stdcall Distance(double* lat1, double* lon1, double* lat2, double* lon2)
 {
-	return R2D * 2 * asin(sqrt(pow(sin(D2R*(lat1-lat2)/2),2) +
-			                   pow(sin(D2R*(lon2-lon1)/2),2) * cos(D2R*lat1) * cos(D2R*lat2)
+	return R2D * 2 * asin(sqrt(pow(sin(D2R*(*lat1-*lat2)/2),2) +
+			                   pow(sin(D2R*(*lon2-*lon1)/2),2) * cos(D2R* *lat1) * cos(D2R* *lat2)
 							  )
 						 );
 }
