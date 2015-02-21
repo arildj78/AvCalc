@@ -56,9 +56,10 @@
 double _stdcall Distance(const double* lat1, const double* lon1, const double* lat2, const double* lon2)
 {
 	return 60 * R2D * 2 * asin(sqrt(pow(sin(D2R*(*lat1-*lat2)/2),2) +
-			                        pow(sin(D2R*(*lon2-*lon1)/2),2) * cos(D2R* *lat1) * cos(D2R* *lat2)
+									pow(sin(D2R*(*lon2-*lon1)/2),2) * cos(D2R* *lat1) * cos(D2R* *lat2)
 								   )
 							  );
+
 }
 
 
