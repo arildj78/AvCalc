@@ -58,7 +58,7 @@ double _stdcall Distance(const double* lat1, const double* lon1, const double* l
 	return 60 * R2D * 2 * asin(sqrt(pow(sin(D2R*(*lat1-*lat2)/2),2) +
 									pow(sin(D2R*(*lon2-*lon1)/2),2) * cos(D2R* *lat1) * cos(D2R* *lat2)
 								   )
-							  );
+	                          );
 
 }
 
@@ -81,13 +81,12 @@ double _stdcall Course (double *lat1, double *lon1, double *lat2, double *lon2)
 		  return 2*M_PI;      //  starting from S pole, return true course north
 	  }
   } else {
-	  // Calculate and return the true course
-	  return fmod(
-				  atan2(sin(*lon2-*lon1) * cos(*lat2),
-						cos(*lat1) * sin(*lat2) - sin(*lat1) * cos(*lat2) * cos(*lon2-*lon1)
-					   ),
-				  2*M_PI
-				 );
+      // Calculate and return the true course
+      return fmod(atan2(sin(*lon2-*lon1) * cos(*lat2),
+                        cos(*lat1) * sin(*lat2) - sin(*lat1) * cos(*lat2) * cos(*lon2-*lon1)
+                       ),
+                  2*M_PI
+                 );
   }
 }
 
