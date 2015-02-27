@@ -46,20 +46,22 @@
   and {lat2,lon2} is given by:
 ----------------------------------------------------------------------------
   Implementation
-  Argument 1: INPUT - Pointer to double containing Latitude  of point 1
-  Argument 2: INPUT - Pointer to double containing Longitude of point 1
-  Argument 3: INPUT - Pointer to double containing Latitude  of point 2
-  Argument 4: INPUT - Pointer to double containing Longitude of point 2
+  Argument 1: INPUT - Pointer to double containing Latitude  of point 1 in degrees
+  Argument 2: INPUT - Pointer to double containing Longitude of point 1 in degrees
+  Argument 3: INPUT - Pointer to double containing Latitude  of point 2 in degrees
+  Argument 4: INPUT - Pointer to double containing Longitude of point 2 in degrees
 
   RETURN: Double containing distance in nautical miles (1nm = 1852m)
 --------------------------------------------------------------------------*/
 double _stdcall Distance(const double* lat1, const double* lon1, const double* lat2, const double* lon2)
 {
+    // multiplication by D2R converts input in degrees to radians for the trig functions
+    // multiplication by R2D converts radians to degrees
+    // multiplication by  60 converts degrees to nautical miles
     return 60 * R2D * 2 * asin(sqrt(pow(sin(D2R*(*lat1-*lat2)/2),2) +
                                     pow(sin(D2R*(*lon2-*lon1)/2),2) * cos(D2R* *lat1) * cos(D2R* *lat2)
                                    )
                               );
-
 }
 
 
@@ -69,24 +71,37 @@ double _stdcall Distance(const double* lat1, const double* lon1, const double* l
 * We obtain the initial course, tc1, (at point 1) from point 1 to point 2
 * by the following. The formula fails if the initial point is a pole. We can
 * special case this with as IF statement
-*----------------------------------------------------------------------------*/
+----------------------------------------------------------------------------
+  Implementation
+  Argument 1: INPUT - Pointer to double containing Latitude  of point 1 in degrees
+  Argument 2: INPUT - Pointer to double containing Longitude of point 1 in degrees
+  Argument 3: INPUT - Pointer to double containing Latitude  of point 2 in degrees
+  Argument 4: INPUT - Pointer to double containing Longitude of point 2 in degrees
+
+  RETURN: Double containing initial course in degrees from point1 to point 2
+--------------------------------------------------------------------------*/
 
 
 double _stdcall Course (double *lat1, double *lon1, double *lat2, double *lon2)
 {
-  if (cos(*lat1) < EPS) {     // EPS a small number ~ machine precision
-	  if (*lat1 > 0) {
-		  return M_PI;        //  Starting from N pole, return true course south
+    double radLat1 = D2R * *lat1;
+    double radLon1 = D2R * *lon1;
+    double radLat2 = D2R * *lat2;
+    double radLon2 = D2R * *lon2;
+
+    if (cos(radLat1) < EPS) {     // EPS a small number ~ machine precision
+	  if (radLat1 > 0) {
+		  return R2D * M_PI;      //  Starting from N pole, return true course south
 	  } else {
-		  return 2*M_PI;      //  starting from S pole, return true course north
+		  return R2D * 2*M_PI;    //  starting from S pole, return true course north
 	  }
   } else {
       // Calculate and return the true course
-      return fmod(atan2(sin(*lon2-*lon1) * cos(*lat2),
-                        cos(*lat1) * sin(*lat2) - sin(*lat1) * cos(*lat2) * cos(*lon2-*lon1)
-                       ),
-                  2*M_PI
-                 );
+      return R2D * fmod(atan2(sin(radLon2-radLon1) * cos(radLat2),
+                              cos(radLat1) * sin(radLat2) - sin(radLat1) * cos(radLat2) * cos(radLon2-radLon1)
+                             ),
+                        2*M_PI
+                       );
   }
 }
 
