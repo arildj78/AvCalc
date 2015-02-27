@@ -82,7 +82,7 @@ double _stdcall Distance(const double* lat1, const double* lon1, const double* l
 --------------------------------------------------------------------------*/
 
 
-double _stdcall CourseFinal (double *lat1, double *lon1, double *lat2, double *lon2)
+double _stdcall CourseInitial (double *lat1, double *lon1, double *lat2, double *lon2)
 {
     double radLat1 = D2R * *lat1;
     double radLon1 = D2R * *lon1;
