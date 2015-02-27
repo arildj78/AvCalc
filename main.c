@@ -146,7 +146,7 @@ void _stdcall IntermediatePoint (const double *lat1, const double *lon1, const d
     x = A*cos(radLat1)*cos(radLon1) +  B*cos(radLat2)*cos(radLon2);
     y = A*cos(radLat1)*sin(radLon1) +  B*cos(radLat2)*sin(radLon2);
     z = A*sin(radLat1)              +  B*sin(radLat2);
-    *latresult = R2D * atan2(z,sqrt(x^2+y^2));
+    *latresult = R2D * atan2(z,sqrt(pow(x,2)+pow(y,2)));
     *lonresult = R2D * atan2(y,x);
 }
 
