@@ -82,7 +82,7 @@ double _stdcall Distance(const double* lat1, const double* lon1, const double* l
 --------------------------------------------------------------------------*/
 
 
-double _stdcall Course (double *lat1, double *lon1, double *lat2, double *lon2)
+double _stdcall CourseFinal (double *lat1, double *lon1, double *lat2, double *lon2)
 {
     double radLat1 = D2R * *lat1;
     double radLon1 = D2R * *lon1;
@@ -104,6 +104,53 @@ double _stdcall Course (double *lat1, double *lon1, double *lat2, double *lon2)
                        );
   }
 }
+
+
+/*----------------------------------------------------------------------------
+Intermediate points on a great circle:
+
+In previous sections we have found intermediate points on a great
+circle given either the crossing latitude or longitude. Here we find
+points (lat,lon) a given fraction of the distance (d) between
+them. Suppose the starting point is (lat1,lon1) and the final point
+(lat2,lon2) and we want the point a fraction f along the great circle
+route. f=0 is point 1. f=1 is point 2.  The two points cannot be
+antipodal ( i.e. lat1+lat2=0 and abs(lon1-lon2)=pi) because then the
+route is undefined.  The intermediate latitude and longitude is then given by:
+----------------------------------------------------------------------------
+  Implementation
+  Argument 1: INPUT - Pointer to double containing Latitude  of point 1 in degrees
+  Argument 2: INPUT - Pointer to double containing Longitude of point 1 in degrees
+  Argument 3: INPUT - Pointer to double containing Latitude  of point 2 in degrees
+  Argument 4: INPUT - Pointer to double containing Longitude of point 2 in degrees
+
+  RETURN: Double containing initial course in degrees from point1 to point 2
+--------------------------------------------------------------------------*/
+void _stdcall IntermediatePoint (const double *lat1, const double *lon1, const double *lat2, const double *lon2, const double *fraction, double *latresult, double *lonresult)
+{
+    double A, B, x, y, z, d;
+
+    double radLat1 = D2R * *lat1;
+    double radLon1 = D2R * *lon1;
+    double radLat2 = D2R * *lat2;
+    double radLon2 = D2R * *lon2;
+
+    //d = distance in radians between point 1 and point 2
+    d = 2 * asin(sqrt(pow(sin((radLat1-radLat2)/2),2) +
+                      pow(sin((radLon2-radLon1)/2),2) * cos(radLat1) * cos(radLat2)
+                     )
+                );
+
+    A = sin((1-*fraction)*d)/sin(d);
+    B = sin(*fraction*d)/sin(d);
+    x = A*cos(radLat1)*cos(radLon1) +  B*cos(radLat2)*cos(radLon2);
+    y = A*cos(radLat1)*sin(radLon1) +  B*cos(radLat2)*sin(radLon2);
+    z = A*sin(radLat1)              +  B*sin(radLat2);
+    *latresult = R2D * atan2(z,sqrt(x^2+y^2));
+    *lonresult = R2D * atan2(y,x);
+}
+
+
 
 long long SpeedTest(){
 	LARGE_INTEGER StartingTime, EndingTime, Frequency;
