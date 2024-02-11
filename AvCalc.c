@@ -1,6 +1,6 @@
 /* Aviation Calculation - AvCalc API v0.01
    Copyright (C) 2015  Arild M Johannessen
- 
+
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
@@ -15,7 +15,7 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 /*
- * main.c
+ * AvCalc.c
  * -------------------------------------------------------------------------------
  *                          Aviation Formulary V1.46
  *                              By Ed Williams
@@ -35,7 +35,7 @@
 #include <Windows.h>  //To be removed when speedtesting is complete
 #include <stdio.h>    //To be removed when speedtesting is complete
 #include <inttypes.h> //To be removed when speedtesting is complete
-#include "main.h"
+#include "AvCalc.h"
 
 
 
@@ -53,7 +53,7 @@
 
   RETURN: Double containing distance in nautical miles (1nm = 1852m)
 --------------------------------------------------------------------------*/
-double _stdcall Distance(const double* lat1, const double* lon1, const double* lat2, const double* lon2)
+double AVCALCCALL Distance(const double* lat1, const double* lon1, const double* lat2, const double* lon2)
 {
     // multiplication by D2R converts input in degrees to radians for the trig functions
     // multiplication by R2D converts radians to degrees
@@ -62,7 +62,7 @@ double _stdcall Distance(const double* lat1, const double* lon1, const double* l
                                     pow(sin(D2R*(*lon2-*lon1)/2),2) * cos(D2R* *lat1) * cos(D2R* *lat2)
                                    )
                               );
-}
+};
 
 
 /*----------------------------------------------------------------------------
@@ -82,7 +82,7 @@ double _stdcall Distance(const double* lat1, const double* lon1, const double* l
 --------------------------------------------------------------------------*/
 
 
-double _stdcall CourseInitial (double *lat1, double *lon1, double *lat2, double *lon2)
+double AVCALCCALL CourseInitial (double *lat1, double *lon1, double *lat2, double *lon2)
 {
     double radLat1 = D2R * *lat1;
     double radLon1 = D2R * *lon1;
@@ -91,9 +91,9 @@ double _stdcall CourseInitial (double *lat1, double *lon1, double *lat2, double 
 
     if (cos(radLat1) < EPS) {     // EPS a small number ~ machine precision
 	  if (radLat1 > 0) {
-		  return R2D * M_PI;      //  Starting from N pole, return true course south
+		  return R2D * M_PI;      //  Starting position is North pole, return true course south
 	  } else {
-		  return R2D * 2*M_PI;    //  starting from S pole, return true course north
+		  return R2D * 2*M_PI;    //  Starting position is South pole, return true course north
 	  }
   } else {
       // Calculate and return the true course
@@ -126,7 +126,7 @@ route is undefined.  The intermediate latitude and longitude is then given by:
 
   RETURN: Double containing initial course in degrees from point1 to point 2
 --------------------------------------------------------------------------*/
-void _stdcall IntermediatePoint (const double *lat1, const double *lon1, const double *lat2, const double *lon2, const double *fraction, double *latresult, double *lonresult)
+void AVCALCCALL IntermediatePoint (const double *lat1, const double *lon1, const double *lat2, const double *lon2, const double *fraction, double *latresult, double *lonresult)
 {
     double A, B, x, y, z, d;
 
