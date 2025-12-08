@@ -13,7 +13,8 @@
 #ifdef AVCALC_EXPORTS
   #define AVCALCAPI __declspec(dllexport)
 #else
-  #define AVCALCAPI __declspec(dllimport)
+  //#define AVCALCAPI __declspec(dllimport)
+  #define AVCALCAPI
 #endif
 
 /* Define calling convention in one place, for convenience. */
@@ -34,11 +35,19 @@ extern "C"
 #define R2D 57.295779513082320876798154814105  //multiply radian with R2D to get degrees
 #define D2R 0.01745329251994329576923690768489 //multiply degrees with D2R to get radians
 
-
+#define rho_0 1.2250 //sea level standard density kg/m3
+#define P_0 101325   //sea level standard pressure (Pa)
 
 AVCALCAPI double AVCALCCALL Distance(const double* lat1, const double* lon1, const double* lat2, const double* lon2);
 AVCALCAPI double AVCALCCALL CourseInitial (double *lat1, double *lon1, double *lat2, double *lon2);
 AVCALCAPI void AVCALCCALL IntermediatePoint (const double *lat1, const double *lon1, const double *lat2, const double *lon2, const double *fraction, double *latresult, double *lonresult);
+AVCALCAPI double AVCALCCALL TAS_2(const double *CAS, const double *pressure_alt, const double *oat);
+AVCALCAPI double AVCALCCALL CAS_2(const double *TAS, const double *pressure_alt, const double *oat);
+AVCALCAPI double AVCALCCALL Speed_of_sound(const double *oat);
+AVCALCAPI double AVCALCCALL Pressure_at_altitude(const double *h);
+AVCALCAPI double AVCALCCALL Density_at_altitude(const double *pressure_alt, const double *oat);
+AVCALCAPI double AVCALCCALL Standard_temperature(const double *h);
+
 
 long long SpeedTest();
 int main();
