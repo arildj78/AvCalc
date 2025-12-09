@@ -90,19 +90,19 @@ double AVCALCCALL CourseInitial (double *lat1, double *lon1, double *lat2, doubl
     double radLon2 = D2R * *lon2;
 
     if (cos(radLat1) < EPS) {     // EPS a small number ~ machine precision
-	  if (radLat1 > 0) {
-		  return R2D * M_PI;      //  Starting position is North pole, return true course south
-	  } else {
-		  return R2D * 2*M_PI;    //  Starting position is South pole, return true course north
-	  }
-  } else {
+        if (radLat1 > 0) {
+            return R2D * M_PI;      //  Starting position is North pole, return true course south
+        } else {
+            return R2D * 2*M_PI;    //  Starting position is South pole, return true course north
+        }
+    } else {
       // Calculate and return the true course
-      return R2D * fmod(atan2(sin(radLon2-radLon1) * cos(radLat2),
-                              cos(radLat1) * sin(radLat2) - sin(radLat1) * cos(radLat2) * cos(radLon2-radLon1)
-                             ),
-                        2*M_PI
-                       );
-  }
+        return R2D * fmod(atan2(sin(radLon2-radLon1) * cos(radLat2),
+                                cos(radLat1) * sin(radLat2) - sin(radLat1) * cos(radLat2) * cos(radLon2-radLon1)
+                               ),
+                          2*M_PI
+                         );
+    }
 }
 
 
@@ -151,46 +151,46 @@ void AVCALCCALL IntermediatePoint (const double *lat1, const double *lon1, const
 }
 
 double AVCALCCALL TAS_2(const double *CAS, const double *pressure_alt, const double *oat){
-	return -1; //To be implemented
+    return -1; //To be implemented
 }
 double AVCALCCALL CAS_2(const double *TAS, const double *pressure_alt, const double *oat){
-	return -1; //To be implemented	
+    return -1; //To be implemented	
 }
 
 double AVCALCCALL Speed_of_sound(const double *oat){
-	return 38.967854 * sqrt(273.15 + *oat); //Speed of sound in ft/s
+    return 38.967854 * sqrt(273.15 + *oat); //Speed of sound in ft/s
 }
 
 double AVCALCCALL Pressure_at_altitude(const double *h){
     double p = 0.0;
-	double p_Tr = 0.0;
+	  double p_Tr = 0.0;
 
-	if (*h < 36089.24) {
-    	p = P_0 * pow(1.0 - 6.8755856e-6 * (*h), 5.2558797);
-		return p;
-	} else if ((*h >= 36089.24) && (*h < 65616.8)) {
-		p_Tr = 22632.06;  //Pressure at the tropopause
-    	p = p_Tr * exp(-4.806346e-5 * (*h - 36089.24));
-		return p;
-	} else {
-		return -1; //Error condition	
-  }
+    if (*h < 36089.24) {
+        p = P_0 * pow(1.0 - 6.8755856e-6 * (*h), 5.2558797);
+        return p;
+    } else if ((*h >= 36089.24) && (*h < 65616.8)) {
+        p_Tr = 22632.06;  //Pressure at the tropopause
+        p = p_Tr * exp(-4.806346e-5 * (*h - 36089.24));
+        return p;
+    } else {
+        return -1; //Error condition	
+    }
 }
 
 double AVCALCCALL Density_at_altitude(const double *h, const double *oat){
-	double rho = 0.0;
-	double rho_Tr = 0.0;
+    double rho = 0.0;
+    double rho_Tr = 0.0;
 
-	if (*h < 36089.24) {
-		rho	= rho_0*pow(1.0 - 6.8755856e-6 * (*h), 4.2558797);
-		return rho;
-	} else if ((*h >= 36089.24) && (*h < 65616.8)) {
-		rho_Tr = 0.2970756 * rho_0;
-		rho=rho_Tr*exp(-4.806346e-5 * (*h-36089.24));
-		return rho;
-	} else {
-		return -1; //Error condition
-	}
+    if (*h < 36089.24) {
+        rho	= rho_0*pow(1.0 - 6.8755856e-6 * (*h), 4.2558797);
+        return rho;
+    } else if ((*h >= 36089.24) && (*h < 65616.8)) {
+        rho_Tr = 0.2970756 * rho_0;
+        rho=rho_Tr*exp(-4.806346e-5 * (*h-36089.24));
+        return rho;
+    } else {
+        return -1; //Error condition
+    }
 }
 
 double AVCALCCALL Standard_temperature(const double *pressure_alt){
@@ -199,48 +199,4 @@ double AVCALCCALL Standard_temperature(const double *pressure_alt){
     } else if ((*pressure_alt >= 36089.24) && (*pressure_alt < 65616.8)) {
         return -56.5;
     }
-}
-
-
-long long SpeedTest(){
-	LARGE_INTEGER StartingTime, EndingTime, Frequency;
-	uint64_t  ElapsedNanoseconds;
-	uint64_t  duration;
-
-	QueryPerformanceFrequency(&Frequency);
-
-	unsigned long Repetitions = 20e6;
-
-
-
-	double x;
-	double lat1 = 69;
-	double lon1 = 17;
-	double lat2 = 70;
-	double lon2 = 18;
-	x=0;
-
-
-	//20 mill runthroughs
-	QueryPerformanceCounter(&StartingTime);
-	unsigned long n;
-	for(n = 0;n<Repetitions; n++){
-		//procedure to be tested
-		x=Distance(&lat1, &lon1, &lat2, &lon2);
-	}
-	QueryPerformanceCounter(&EndingTime);
-	duration = EndingTime.QuadPart - StartingTime.QuadPart;
-
-	ElapsedNanoseconds = 1e9 * duration;
-	ElapsedNanoseconds /= Frequency.QuadPart;
-
-	double Average = (double) ElapsedNanoseconds/(double) Repetitions;
-
-	printf("Average runtime over %.2e repetitions = %.8fns\n",(double) Repetitions, Average );
-
-}
-
-int main(){
-	SpeedTest();
-	return 0;
 }

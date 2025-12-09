@@ -11,10 +11,10 @@
 
 /* You should define ADD_EXPORTS *only* when building the DLL. */
 #ifdef AVCALC_EXPORTS
-  #define AVCALCAPI __declspec(dllexport)
+    #define AVCALCAPI __declspec(dllexport)
 #else
-  //#define AVCALCAPI __declspec(dllimport)
-  #define AVCALCAPI
+    //#define AVCALCAPI __declspec(dllimport)
+    #define AVCALCAPI
 #endif
 
 /* Define calling convention in one place, for convenience. */
@@ -47,11 +47,6 @@ AVCALCAPI double AVCALCCALL Speed_of_sound(const double *oat);
 AVCALCAPI double AVCALCCALL Pressure_at_altitude(const double *h);
 AVCALCAPI double AVCALCCALL Density_at_altitude(const double *pressure_alt, const double *oat);
 AVCALCAPI double AVCALCCALL Standard_temperature(const double *h);
-
-
-long long SpeedTest();
-int main();
-
 
 
 
