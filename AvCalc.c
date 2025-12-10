@@ -31,6 +31,7 @@
  * Calling convention for all methods is: stdcall (compatible with Win32 API)
  * -----------------------------------------------------------------------------*/
 
+#define _USE_MATH_DEFINES
 #include <math.h>
 #include <Windows.h>  //To be removed when speedtesting is complete
 #include <stdio.h>    //To be removed when speedtesting is complete
@@ -194,9 +195,51 @@ double AVCALCCALL Density_at_altitude(const double *h, const double *oat){
 }
 
 double AVCALCCALL Standard_temperature(const double *pressure_alt){
-    if (*pressure_alt < 36089.24) {
-        return 15 - .0019812 * (*pressure_alt);
-    } else if ((*pressure_alt >= 36089.24) && (*pressure_alt < 65616.8)) {
-        return -56.5;
+    const double h = *pressure_alt; // feet
+
+    // Band boundaries (feet)
+    const double h0 = -16404.20;  // -5 km
+    const double h1 = 0.0;        // 0 km
+    const double h2 = 36089.24;   // 11 km
+    const double h3 = 65616.80;   // 20 km
+    const double h4 = 104986.88;  // 32 km
+    const double h5 = 154199.48;  // 47 km
+    const double h6 = 167322.83;  // 51 km
+    const double h7 = 232939.63;  // 71 km
+    const double h8 = 262467.19;  // 80 km
+
+    // Reject out-of-range inputs
+    if (h < h0 || h > h8) {
+        return NAN; // Out of modeled range [-5 km, 80 km]
     }
+
+    // Lapse rates (°C per foot), converted from °C/km
+    const double L0 = -6.5 / 3280.84; // -5 km to 0 km
+    const double L1 = -6.5 / 3280.84; // 0 km to 11 km
+    const double L2 =  0.0;           // 11 km to 20 km (isothermal)
+    const double L3 =  1.0 / 3280.84; // 20 km to 32 km
+    const double L4 =  2.8 / 3280.84; // 32 km to 47 km
+    const double L5 =  0.0;           // 47 km to 51 km (isothermal)
+    const double L6 = -2.8 / 3280.84; // 51 km to 71 km
+    const double L7 = -2.0 / 3280.84; // 71 km to 80 km
+
+    // Anchor temperatures at band starts (continuous)
+    const double T0 = 15.0 - L0 * (h1 - h0);           // at -5 km (≈47.5°C)
+    const double T1 = 15.0;                            // at 0 ft
+    const double T2 = T1 + L1 * (h2 - h1);             // at 11 km
+    const double T3 = T2 + L2 * (h3 - h2);             // at 20 km
+    const double T4 = T3 + L3 * (h4 - h3);             // at 32 km
+    const double T5 = T4 + L4 * (h5 - h4);             // at 47 km
+    const double T6 = T5 + L5 * (h6 - h5);             // at 51 km
+    const double T7 = T6 + L6 * (h7 - h6);             // at 71 km
+    const double T8 = T7 + L7 * (h8 - h7);             // at 80 km
+
+    if (h < h1) return T0 + L0 * (h - h0);        // -5 km to 0 km
+    if (h < h2) return T1 + L1 * (h - h1);        // 0 to 11 km
+    if (h < h3) return T2 + L2 * (h - h2);        // 11 to 20 km (iso)
+    if (h < h4) return T3 + L3 * (h - h3);        // 20 to 32 km
+    if (h < h5) return T4 + L4 * (h - h4);        // 32 to 47 km
+    if (h < h6) return T5 + L5 * (h - h5);        // 47 to 51 km (iso)
+    if (h < h7) return T6 + L6 * (h - h6);        // 51 to 71 km
+    /* h <= h8 */ return T7 + L7 * (h - h7);      // 71 to 80 km
 }

@@ -53,18 +53,43 @@ void test_Speed_of_sound(void) {
     TEST_ASSERT_FLOAT_WITHIN(0.5, 636.08, cs);
 }
 
-void test_Standard_temperature_8000ft(void) {
-    double pa = 8000.0;
-    double temp = Standard_temperature(&pa);
+void test_Standard_temperature(void) {
+    // Standard atmosphere temperatures at various altitudes
+    // Format: altitude in feet, expected temperature in Celsius
     
-    TEST_ASSERT_FLOAT_WITHIN(0.1, -0.85, temp);
-}
+    struct {
+        double feet;
+        double expected_temp;
+    } test_cases[] = {
+        {-17000.00,     NAN},   // Below valid range
+        {-16404.20,  47.500},   // -5 km (sea level below standard)
+        {0.0,        15.000},   //  0 km (sea level, standard)
+        {36089.24,  -56.500},   // 11 km (tropopause)
+        {65616.80,  -56.500},   // 20 km (stratosphere, constant temp)
+        {104986.88, -44.500},   // 32 km (stratosphere warming)
+        {154199.48,  -2.500},   // 47 km (mesosphere)
+        {167322.83,  -2.500},   // 51 km (mesosphere)
+        {232939.63, -58.500},   // 71 km (upper mesosphere)
+        {262467.19, -76.500},   // 80 km (thermosphere)
+        {270000.00,     NAN},   // Above valid range
 
-void test_Standard_temperature_40000ft(void) {
-    double pa = 40000.0;
-    double temp = Standard_temperature(&pa);
+        { -3000,  20.944},   
+        {  5000,   5.094},   
+        { 25000, -34.530},   
+        { 50000, -56.500},  
+        { 70000, -55.164},   
+        {125000, -27.420},   
+        {160000,  -2.500},   
+        {200000, -30.388},
+        {240000, -62.804} 
+    };
     
-    TEST_ASSERT_EQUAL_FLOAT(-56.5, temp);
+    int num_cases = sizeof(test_cases) / sizeof(test_cases[0]);
+    
+    for (int i = 0; i < num_cases; i++) {
+        double temp = Standard_temperature(&test_cases[i].feet);
+        TEST_ASSERT_FLOAT_WITHIN(0.001, test_cases[i].expected_temp, temp);
+    }
 }
 
 void test_Density_at_sea_level(void) {
@@ -96,8 +121,7 @@ int main(void) {
     RUN_TEST(test_CourseInitial_LAX_to_JFK);
     RUN_TEST(test_IntermediatePoint);
     RUN_TEST(test_Speed_of_sound);
-    RUN_TEST(test_Standard_temperature_8000ft);
-    RUN_TEST(test_Standard_temperature_40000ft);
+    RUN_TEST(test_Standard_temperature);
     RUN_TEST(test_Density_at_sea_level);
     RUN_TEST(test_Pressure_at_sea_level);
     RUN_TEST(test_Pressure_at_tropopause);
