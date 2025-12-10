@@ -60,35 +60,44 @@ void test_Standard_temperature(void) {
     struct {
         double feet;
         double expected_temp;
+        const char *description;        
     } test_cases[] = {
-        {-17000.00,     NAN},   // Below valid range
-        {-16404.20,  47.500},   // -5 km (sea level below standard)
-        {0.0,        15.000},   //  0 km (sea level, standard)
-        {36089.24,  -56.500},   // 11 km (tropopause)
-        {65616.80,  -56.500},   // 20 km (stratosphere, constant temp)
-        {104986.88, -44.500},   // 32 km (stratosphere warming)
-        {154199.48,  -2.500},   // 47 km (mesosphere)
-        {167322.83,  -2.500},   // 51 km (mesosphere)
-        {232939.63, -58.500},   // 71 km (upper mesosphere)
-        {262467.19, -76.500},   // 80 km (thermosphere)
-        {270000.00,     NAN},   // Above valid range
+        {-16404.20,  47.500,   "-5 km  (below sea level)"},
+        {     0.00,  15.000,   "0 km  (sea level)"},
+        { 36089.24, -56.500,   "11 km  (lower tropopause)"},
+        { 65616.80, -56.500,   "20 km  (upper tropopause)"},
+        {104986.88, -44.500,   "32 km  (middle stratosphere)"},
+        {154199.48,  -2.500,   "47 km  (lower stratopause)"},
+        {167322.83,  -2.500,   "51 km  (upper stratopause)"},
+        {232939.63, -58.500,   "71 km  (middle mesosphere)"},
+        {262467.19, -76.500,   "80 km  (lower mesopause)"},
+         
+        { -3000.0,  20.944,   "-3 000 feet  (troposhpere)"},   
+        {  5000.0,   5.094,   "5 000 feet  (troposhpere)"},   
+        { 25000.0, -34.530,   "25 000 feet  (troposhpere)"},   
+        { 50000.0, -56.500,   "50 000 feet  (tropopause)"},  
+        { 70000.0, -55.164,   "70 000 feet  (lower stratoshpere)"},   
+        {125000.0, -27.420,   "125 000 feet  (upper stratoshpere)"},   
+        {160000.0,  -2.500,   "160 000 feet  (stratopause)"},   
+        {200000.0, -30.388,   "200 000 feet  (lower mesosphere)"},
+        {240000.0, -62.804,   "240 000 feet  (upper mesosphere)"},
 
-        { -3000,  20.944},   
-        {  5000,   5.094},   
-        { 25000, -34.530},   
-        { 50000, -56.500},  
-        { 70000, -55.164},   
-        {125000, -27.420},   
-        {160000,  -2.500},   
-        {200000, -30.388},
-        {240000, -62.804} 
+        {-16000.0,     NAN,   "-16 000 feet  (below valid range)"},
+        {262500.0,     NAN,   "262 500 feet  (above valid range)"}
     };
     
     int num_cases = sizeof(test_cases) / sizeof(test_cases[0]);
-    
+    char message[100];
+
     for (int i = 0; i < num_cases; i++) {
         double temp = Standard_temperature(&test_cases[i].feet);
-        TEST_ASSERT_FLOAT_WITHIN(0.001, test_cases[i].expected_temp, temp);
+        sprintf(message, "Case %d: %s", i, test_cases[i].description);
+        TEST_ASSERT_FLOAT_WITHIN_MESSAGE(
+            0.001,                          // Test for value within 0.001 of expected value
+            test_cases[i].expected_temp, 
+            temp,
+            message
+        );
     }
 }
 
