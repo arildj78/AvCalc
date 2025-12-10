@@ -1,5 +1,5 @@
 @echo off
-REM filepath: build_unity_tests.bat
+REM filepath: build_tests.bat
 if not exist ".\bin\test" mkdir ".\bin\test"
 
 echo Compiling Unity tests...
