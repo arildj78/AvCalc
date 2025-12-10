@@ -19,7 +19,7 @@
  * -------------------------------------------------------------------------------
  *                          Aviation Formulary V1.46
  *                              By Ed Williams
- *             Converted to C by Arild M Johannessen (February 2015)
+ *             Converted to C by Arild M Johannessen (December 2025)
  *
  * -------------------------------------------------------------------------------
  * Change from the original work and implementation notice
@@ -27,7 +27,14 @@
  * Eastern longitudes are now positive values, western are negative.
  * North/south is unchanged with north as positive
  * Input is changed from radians to degrees and nautical miles.
-
+ *
+ * The following functions are re-implemented to conform to
+ * ICAO Doc 7488 - MANUAL OF THE ICAO STANDARD ATMOSPHERE
+ * from -5km to 80km altitude:
+ *          Standard_temperature()
+ * 
+ *
+ *
  * Calling convention for all methods is: stdcall (compatible with Win32 API)
  * -----------------------------------------------------------------------------*/
 
@@ -198,15 +205,15 @@ double AVCALCCALL Standard_temperature(const double *pressure_alt){
     const double h = *pressure_alt; // feet
 
     // Band boundaries (feet)
-    const double h0 = -16404.20;  // -5 km
-    const double h1 = 0.0;        // 0 km
-    const double h2 = 36089.24;   // 11 km
-    const double h3 = 65616.80;   // 20 km
-    const double h4 = 104986.88;  // 32 km
-    const double h5 = 154199.48;  // 47 km
-    const double h6 = 167322.83;  // 51 km
-    const double h7 = 232939.63;  // 71 km
-    const double h8 = 262467.19;  // 80 km
+    const double h0 = -5000 / 0.3048;  // -5 km  (below sea level)
+    const double h1 = 0.0;             //  0 km  (sea level)
+    const double h2 = 11000 / 0.3048;  // 11 km  (lower tropopause)
+    const double h3 = 20000 / 0.3048;  // 20 km  (upper tropopause)
+    const double h4 = 32000 / 0.3048;  // 32 km  (middle stratosphere)
+    const double h5 = 47000 / 0.3048;  // 47 km  (lower stratopause)
+    const double h6 = 51000 / 0.3048;  // 51 km  (upper stratopause)
+    const double h7 = 71000 / 0.3048;  // 71 km  (middle mesosphere)
+    const double h8 = 80000 / 0.3048;  // 80 km  (lower mesopause)
 
     // Reject out-of-range inputs
     if (h < h0 || h > h8) {
@@ -214,14 +221,14 @@ double AVCALCCALL Standard_temperature(const double *pressure_alt){
     }
 
     // Lapse rates (°C per foot), converted from °C/km
-    const double L0 = -6.5 / 3280.84; // -5 km to 0 km
-    const double L1 = -6.5 / 3280.84; // 0 km to 11 km
-    const double L2 =  0.0;           // 11 km to 20 km (isothermal)
-    const double L3 =  1.0 / 3280.84; // 20 km to 32 km
-    const double L4 =  2.8 / 3280.84; // 32 km to 47 km
-    const double L5 =  0.0;           // 47 km to 51 km (isothermal)
-    const double L6 = -2.8 / 3280.84; // 51 km to 71 km
-    const double L7 = -2.0 / 3280.84; // 71 km to 80 km
+    const double L0 = -6.5 / 3280.84; // -5 km to 0 km  (troposphere)
+    const double L1 = -6.5 / 3280.84; //  0 km to 11 km (troposphere)
+    const double L2 =  0.0;           // 11 km to 20 km (tropsopause, isothermal)
+    const double L3 =  1.0 / 3280.84; // 20 km to 32 km (stratosphere, lower)
+    const double L4 =  2.8 / 3280.84; // 32 km to 47 km (stratosphere, upper)
+    const double L5 =  0.0;           // 47 km to 51 km (stratopause, isothermal)
+    const double L6 = -2.8 / 3280.84; // 51 km to 71 km (mesosphere, lower)
+    const double L7 = -2.0 / 3280.84; // 71 km to 80 km (mesosphere, upper)
 
     // Anchor temperatures at band starts (continuous)
     const double T0 = 15.0 - L0 * (h1 - h0);           // at -5 km (≈47.5°C)
@@ -234,6 +241,7 @@ double AVCALCCALL Standard_temperature(const double *pressure_alt){
     const double T7 = T6 + L6 * (h7 - h6);             // at 71 km
     const double T8 = T7 + L7 * (h8 - h7);             // at 80 km
 
+    // Calculate temperature based on altitude band
     if (h < h1) return T0 + L0 * (h - h0);        // -5 km to 0 km
     if (h < h2) return T1 + L1 * (h - h1);        // 0 to 11 km
     if (h < h3) return T2 + L2 * (h - h2);        // 11 to 20 km (iso)
