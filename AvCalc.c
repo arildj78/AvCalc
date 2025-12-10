@@ -48,6 +48,70 @@
 
 
 /*--------------------------------------------------------------------------
+  The standard temperature at altitude
+
+  Given the geopotential altitude in feet, the function returns
+  temperature in °C
+----------------------------------------------------------------------------
+  Implementation
+  Argument 1: INPUT - Pointer to double containing altitude in feet
+
+  RETURN: Double containing temperature in °C
+--------------------------------------------------------------------------*/
+double AVCALCCALL Standard_temperature(const double *pressure_alt){
+    const double h = *pressure_alt; // feet
+
+    // Band boundaries (feet)
+    const double h0 = -5000 / 0.3048;  // -5 km  (below sea level)
+    const double h1 = 0.0;             //  0 km  (sea level)
+    const double h2 = 11000 / 0.3048;  // 11 km  (lower tropopause)
+    const double h3 = 20000 / 0.3048;  // 20 km  (upper tropopause)
+    const double h4 = 32000 / 0.3048;  // 32 km  (middle stratosphere)
+    const double h5 = 47000 / 0.3048;  // 47 km  (lower stratopause)
+    const double h6 = 51000 / 0.3048;  // 51 km  (upper stratopause)
+    const double h7 = 71000 / 0.3048;  // 71 km  (middle mesosphere)
+    const double h8 = 80000 / 0.3048;  // 80 km  (lower mesopause)
+
+    // Reject out-of-range inputs
+    if (h < h0 || h > h8) {
+        return NAN; // Out of modeled range [-5 km, 80 km]
+    }
+
+    // Lapse rates (°C per foot), converted from °C/km
+    const double L0 = -6.5 / 3280.84; // -5 km to 0 km  (troposphere)
+    const double L1 = -6.5 / 3280.84; //  0 km to 11 km (troposphere)
+    const double L2 =  0.0;           // 11 km to 20 km (tropsopause, isothermal)
+    const double L3 =  1.0 / 3280.84; // 20 km to 32 km (stratosphere, lower)
+    const double L4 =  2.8 / 3280.84; // 32 km to 47 km (stratosphere, upper)
+    const double L5 =  0.0;           // 47 km to 51 km (stratopause, isothermal)
+    const double L6 = -2.8 / 3280.84; // 51 km to 71 km (mesosphere, lower)
+    const double L7 = -2.0 / 3280.84; // 71 km to 80 km (mesosphere, upper)
+
+    // Anchor temperatures at band starts (continuous)
+    const double T0 = 15.0 - L0 * (h1 - h0);           // at -5 km (≈47.5°C)
+    const double T1 = 15.0;                            // at 0 ft
+    const double T2 = T1 + L1 * (h2 - h1);             // at 11 km
+    const double T3 = T2 + L2 * (h3 - h2);             // at 20 km
+    const double T4 = T3 + L3 * (h4 - h3);             // at 32 km
+    const double T5 = T4 + L4 * (h5 - h4);             // at 47 km
+    const double T6 = T5 + L5 * (h6 - h5);             // at 51 km
+    const double T7 = T6 + L6 * (h7 - h6);             // at 71 km
+    const double T8 = T7 + L7 * (h8 - h7);             // at 80 km
+
+    // Calculate temperature based on altitude band
+    if (h < h1) return T0 + L0 * (h - h0);        // -5 km to 0 km
+    if (h < h2) return T1 + L1 * (h - h1);        // 0 to 11 km
+    if (h < h3) return T2 + L2 * (h - h2);        // 11 to 20 km (iso)
+    if (h < h4) return T3 + L3 * (h - h3);        // 20 to 32 km
+    if (h < h5) return T4 + L4 * (h - h4);        // 32 to 47 km
+    if (h < h6) return T5 + L5 * (h - h5);        // 47 to 51 km (iso)
+    if (h < h7) return T6 + L6 * (h - h6);        // 51 to 71 km
+    /* h <= h8 */ return T7 + L7 * (h - h7);      // 71 to 80 km
+}
+
+
+
+/*--------------------------------------------------------------------------
   Distance between points
 
   The great circle distance d between two points with coordinates {lat1,lon1}
@@ -201,53 +265,3 @@ double AVCALCCALL Density_at_altitude(const double *h, const double *oat){
     }
 }
 
-double AVCALCCALL Standard_temperature(const double *pressure_alt){
-    const double h = *pressure_alt; // feet
-
-    // Band boundaries (feet)
-    const double h0 = -5000 / 0.3048;  // -5 km  (below sea level)
-    const double h1 = 0.0;             //  0 km  (sea level)
-    const double h2 = 11000 / 0.3048;  // 11 km  (lower tropopause)
-    const double h3 = 20000 / 0.3048;  // 20 km  (upper tropopause)
-    const double h4 = 32000 / 0.3048;  // 32 km  (middle stratosphere)
-    const double h5 = 47000 / 0.3048;  // 47 km  (lower stratopause)
-    const double h6 = 51000 / 0.3048;  // 51 km  (upper stratopause)
-    const double h7 = 71000 / 0.3048;  // 71 km  (middle mesosphere)
-    const double h8 = 80000 / 0.3048;  // 80 km  (lower mesopause)
-
-    // Reject out-of-range inputs
-    if (h < h0 || h > h8) {
-        return NAN; // Out of modeled range [-5 km, 80 km]
-    }
-
-    // Lapse rates (°C per foot), converted from °C/km
-    const double L0 = -6.5 / 3280.84; // -5 km to 0 km  (troposphere)
-    const double L1 = -6.5 / 3280.84; //  0 km to 11 km (troposphere)
-    const double L2 =  0.0;           // 11 km to 20 km (tropsopause, isothermal)
-    const double L3 =  1.0 / 3280.84; // 20 km to 32 km (stratosphere, lower)
-    const double L4 =  2.8 / 3280.84; // 32 km to 47 km (stratosphere, upper)
-    const double L5 =  0.0;           // 47 km to 51 km (stratopause, isothermal)
-    const double L6 = -2.8 / 3280.84; // 51 km to 71 km (mesosphere, lower)
-    const double L7 = -2.0 / 3280.84; // 71 km to 80 km (mesosphere, upper)
-
-    // Anchor temperatures at band starts (continuous)
-    const double T0 = 15.0 - L0 * (h1 - h0);           // at -5 km (≈47.5°C)
-    const double T1 = 15.0;                            // at 0 ft
-    const double T2 = T1 + L1 * (h2 - h1);             // at 11 km
-    const double T3 = T2 + L2 * (h3 - h2);             // at 20 km
-    const double T4 = T3 + L3 * (h4 - h3);             // at 32 km
-    const double T5 = T4 + L4 * (h5 - h4);             // at 47 km
-    const double T6 = T5 + L5 * (h6 - h5);             // at 51 km
-    const double T7 = T6 + L6 * (h7 - h6);             // at 71 km
-    const double T8 = T7 + L7 * (h8 - h7);             // at 80 km
-
-    // Calculate temperature based on altitude band
-    if (h < h1) return T0 + L0 * (h - h0);        // -5 km to 0 km
-    if (h < h2) return T1 + L1 * (h - h1);        // 0 to 11 km
-    if (h < h3) return T2 + L2 * (h - h2);        // 11 to 20 km (iso)
-    if (h < h4) return T3 + L3 * (h - h3);        // 20 to 32 km
-    if (h < h5) return T4 + L4 * (h - h4);        // 32 to 47 km
-    if (h < h6) return T5 + L5 * (h - h5);        // 47 to 51 km (iso)
-    if (h < h7) return T6 + L6 * (h - h6);        // 51 to 71 km
-    /* h <= h8 */ return T7 + L7 * (h - h7);      // 71 to 80 km
-}

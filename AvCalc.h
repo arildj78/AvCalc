@@ -38,6 +38,7 @@ extern "C"
 #define rho_0 1.2250 //sea level standard density kg/m3
 #define P_0 101325   //sea level standard pressure (Pa)
 
+AVCALCAPI double AVCALCCALL Standard_temperature(const double *h);
 AVCALCAPI double AVCALCCALL Distance(const double* lat1, const double* lon1, const double* lat2, const double* lon2);
 AVCALCAPI double AVCALCCALL CourseInitial (double *lat1, double *lon1, double *lat2, double *lon2);
 AVCALCAPI void AVCALCCALL IntermediatePoint (const double *lat1, const double *lon1, const double *lat2, const double *lon2, const double *fraction, double *latresult, double *lonresult);
@@ -46,7 +47,6 @@ AVCALCAPI double AVCALCCALL CAS_2(const double *TAS, const double *pressure_alt,
 AVCALCAPI double AVCALCCALL Speed_of_sound(const double *oat);
 AVCALCAPI double AVCALCCALL Pressure_at_altitude(const double *h);
 AVCALCAPI double AVCALCCALL Density_at_altitude(const double *pressure_alt, const double *oat);
-AVCALCAPI double AVCALCCALL Standard_temperature(const double *h);
 
 
 
