@@ -54,6 +54,13 @@
 /*--------------------------------------------------------------------------
   Distance between points
 
+  On a spherical earth the shortest distance between two points is along
+  the great circle connecting them. An online calculator can be found at
+  https://edwilliams.org/gccalc.htm
+
+  This function should be replaced at a later time with an
+  WGS-84 ellipsoid-based model.
+
   The great circle distance d between two points with coordinates {lat1,lon1}
   and {lat2,lon2} is given by:
 ----------------------------------------------------------------------------
