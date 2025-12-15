@@ -3,9 +3,9 @@ REM filepath: build_tests.bat
 if not exist ".\bin\test" mkdir ".\bin\test"
 
 echo Compiling Unity tests...
-gcc -c tests\unity.c -o bin\test\unity.o
+gcc -c tests\unity.c -o bin\test\unity.o -D UNITY_INCLUDE_DOUBLE
 gcc -c AvCalc.c -o bin\test\AvCalc.o
-gcc -c tests\test_AvCalc.c -Itests -o bin\test\test_AvCalc.o
+gcc -c tests\test_AvCalc.c -Itests -o bin\test\test_AvCalc.o -D UNITY_INCLUDE_DOUBLE
 
 echo Linking...
 gcc bin\test\unity.o bin\test\AvCalc.o bin\test\test_AvCalc.o -o bin\test\test_AvCalc.exe -lm

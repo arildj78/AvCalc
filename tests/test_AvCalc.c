@@ -18,7 +18,7 @@ void test_Distance_LAX_to_JFK(void) {
     
     double dist = Distance(&lat1, &lon1, &lat2, &lon2);
     
-    TEST_ASSERT_FLOAT_WITHIN(5.0, 2144.0, dist);
+    TEST_ASSERT_DOUBLE_WITHIN(5.0, 2144.0, dist);
 }
 
 void test_CourseInitial_LAX_to_JFK(void) {
@@ -29,7 +29,7 @@ void test_CourseInitial_LAX_to_JFK(void) {
     
     double course = CourseInitial(&lat1, &lon1, &lat2, &lon2);
     
-    TEST_ASSERT_FLOAT_WITHIN(0.5, 66.0, course);
+    TEST_ASSERT_DOUBLE_WITHIN(0.5, 66.0, course);
 }
 
 void test_IntermediatePoint(void) {
@@ -42,8 +42,8 @@ void test_IntermediatePoint(void) {
     
     IntermediatePoint(&lat1, &lon1, &lat2, &lon2, &fraction, &lat_result, &lon_result);
     
-    TEST_ASSERT_FLOAT_WITHIN(0.02, 38.66945, lat_result);
-    TEST_ASSERT_FLOAT_WITHIN(0.05, -101.62617, lon_result);
+    TEST_ASSERT_DOUBLE_WITHIN(0.02, 38.66945, lat_result);
+    TEST_ASSERT_DOUBLE_WITHIN(0.05, -101.62617, lon_result);
 }
 
 void test_Standard_temperature(void) {
@@ -85,7 +85,7 @@ void test_Standard_temperature(void) {
     for (int i = 0; i < num_cases; i++) {
         double temp = Standard_temperature(&test_cases[i].feet);
         sprintf(message, "Case %d: %s", i, test_cases[i].description);
-        TEST_ASSERT_FLOAT_WITHIN_MESSAGE(
+        TEST_ASSERT_DOUBLE_WITHIN_MESSAGE(
             0.001,                          // Test for value within 0.001 of expected value
             test_cases[i].expected_temp, 
             temp,
@@ -98,7 +98,7 @@ void test_Speed_of_sound(void) {
     double oat = -6.72;
     double cs = Speed_of_sound(&oat);
     
-    TEST_ASSERT_FLOAT_WITHIN(0.5, 636.08, cs);
+    TEST_ASSERT_DOUBLE_WITHIN(0.5, 636.08, cs);
 }
 
 void test_Density_at_sea_level(void) {
@@ -106,21 +106,21 @@ void test_Density_at_sea_level(void) {
     double oat = 15.0;
     double rho = Density_at_altitude(&h, &oat);
     
-    TEST_ASSERT_FLOAT_WITHIN(1e-6, rho_0, rho);
+    TEST_ASSERT_DOUBLE_WITHIN(1e-6, rho_0, rho);
 }
 
 void test_Pressure_at_sea_level(void) {
     double h = 0.0;
     double p = Pressure_at_altitude(&h);
     
-    TEST_ASSERT_FLOAT_WITHIN(0.1, P_0, p);
+    TEST_ASSERT_DOUBLE_WITHIN(0.1, P_0, p);
 }
 
 void test_Pressure_at_tropopause(void) {
     double h = 36089.24;
     double p = Pressure_at_altitude(&h);
     
-    TEST_ASSERT_FLOAT_WITHIN(1.0, 22632.06, p);
+    TEST_ASSERT_DOUBLE_WITHIN(1.0, 22632.06, p);
 }
 
 int main(void) {
